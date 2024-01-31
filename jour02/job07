@@ -1,0 +1,38 @@
+import mysql.connector
+
+class Employe:
+    def __init__(self, host, user, password, database):
+        self.connection = mysql.connector.connect(host=host, user=user, password=password, database=database)
+        self.cursor = self.connection.cursor()
+
+    def close_connection(self):
+        self.cursor.close()
+        self.connection.close()
+
+    def fetch_employees_with_salary_above(self, salary_threshold):
+        query = f"SELECT * FROM employe WHERE salaire > {salary_threshold};"
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def fetch_employees_with_service(self):
+        query = """
+        SELECT e.nom AS nom_employe, e.prenom, e.salaire, s.nom AS service
+        FROM employe e
+        JOIN service s ON e.id_service = s.id;
+        """
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+employe_manager = Employe(host="localhost", user="root", password="123soleil", database="laplateforme")
+employes = employe_manager.fetch_employees_with_salary_above(3000)
+print("Employés avec un salaire supérieur à 3000 €:")
+for employe in employes:
+    print(employe)
+print()
+
+employes_with_service = employe_manager.fetch_employees_with_service()
+print("Employés avec leur service:")
+for employe in employes_with_service:
+    print(employe)
+
+employe_manager.close_connection()
