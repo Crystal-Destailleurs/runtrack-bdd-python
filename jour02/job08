@@ -1,0 +1,50 @@
+import mysql.connector
+
+# Connexion à la base de données MySQL
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="123soleil",
+    database="zoo"
+)
+
+# Créer un curseur pour exécuter les requêtes
+cursor = conn.cursor()
+
+def create_cage(id, superficie, capacite_max):
+    cursor.execute('''INSERT INTO cage (superficie, capacite_max) VALUES (%s, %s)''', (superficie, capacite_max))
+    conn.commit()
+
+
+# Exemple d'utilisation pour créer des cages
+create_cage(1, 50, 5)  # Créer une cage avec une superficie de 50 mètres carrés et une capacité maximale de 5 animaux
+create_cage(2, 40, 4)  # Créer une autre cage avec une superficie de 40 mètres carrés et une capacité maximale de 4 animaux
+
+def ajouter_animal(nom, race, id, date_naissance, pays_origine):
+    cursor.execute('''INSERT INTO animal (nom, race, id_cage, date_naissance, pays_origine)
+                      VALUES (%s, %s, %s, %s, %s)''', (nom, race, id, date_naissance, pays_origine))
+    conn.commit()
+
+
+# Fonction pour calculer la superficie totale de toutes les cages
+def calculer_superficie_totale():
+    cursor.execute("SELECT SUM(superficie) FROM cage")
+    result = cursor.fetchone()[0]
+    if result is not None:
+        return result
+    else:
+        return 0
+
+# Exemple d'utilisation
+
+# Ajouter un animal
+ajouter_animal("Lion", "Félin", 1, "2010-01-01", "Afrique")
+ajouter_animal("Gorille", "Primate", 1, "2015-01-01", "Afrique")
+ajouter_animal("Tigre", "Félin", 2, "2012-01-01", "Asie")
+
+# Affichage de la superficie totale
+print("Superficie totale de toutes les cages :", calculer_superficie_totale())
+
+# Fermer la connexion
+cursor.close()
+conn.close()
